@@ -806,6 +806,11 @@ def convert_to_usd(gltf_file, usd_file, fps, scale, arkit=False, verbose=False, 
                     usd.logger.error('could not create {}'.format(usd_file))
 
 
+def main(args):
+    if args.gltf_file:
+        convert_to_usd(os.path.expanduser(args.gltf_file), os.path.abspath(os.path.expanduser(args.usd_file)), args.fps, args.scale, args.arkit, args.verbose, args.use_euler_rotation, args.optimize_textures)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Convert glTF to USD: v{}'.format(__version__))
     parser.add_argument('--gltf', '-g', action='store', dest='gltf_file', help='glTF file (in .gltf format)', required=True)
@@ -817,6 +822,4 @@ if __name__ == '__main__':
     parser.add_argument('--use-euler-rotation', action='store_true', dest='use_euler_rotation', help='sets euler rotations for node animations instead of quaternion rotations')
     parser.add_argument('--optimize-textures', action='store_true', dest='optimize_textures', default=False, help='Specifies if image file size should be optimized and reduced at the expense of longer export time')
     args = parser.parse_args()
-
-    if args.gltf_file:
-        convert_to_usd(os.path.expanduser(args.gltf_file), os.path.abspath(os.path.expanduser(args.usd_file)), args.fps, args.scale, args.arkit, args.verbose, args.use_euler_rotation, args.optimize_textures)
+    main(args)
