@@ -45,8 +45,7 @@ class GLTF2USD(object):
             usd_file {str} -- path to store the generated usda file
             verbose {boolean} -- specifies if the output should be verbose from this tool
         """
-        self.logger = logging.getLogger('gltf2usd')
-        self.logger.setLevel(logging.DEBUG)
+        self.logger = logging.getLogger()
         if len(self.logger.handlers) == 0:
             console_handler = logging.StreamHandler()
             console_handler.setLevel(logging.DEBUG)
