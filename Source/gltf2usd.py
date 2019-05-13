@@ -45,11 +45,11 @@ class GLTF2USD(object):
             usd_file {str} -- path to store the generated usda file
             verbose {boolean} -- specifies if the output should be verbose from this tool
         """
-        self.logger = logging.getLogger('gltf2usd')
-        self.logger.setLevel(logging.DEBUG)
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
-        self.logger.addHandler(console_handler)
+        self.logger = logging.getLogger()
+        if len(self.logger.handlers) == 0:
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.DEBUG)
+            self.logger.addHandler(console_handler)
 
         self.fps = fps
         self.gltf_loader = GLTF2Loader(gltf_file, optimize_textures, generate_texture_transform_texture)
@@ -822,7 +822,7 @@ def convert_to_usd(gltf_file, usd_file, fps, scale, arkit=False, verbose=False, 
             resolved_asset = r.Resolve(ntpath.basename(usdc_file))
             context = r.CreateDefaultContextForAsset(resolved_asset)
 
-            success = check_usd_compliance(resolved_asset, arkit=args.arkit)
+            success = check_usd_compliance(resolved_asset, arkit=arkit)
             with Ar.ResolverContextBinder(context):
                 if arkit and not success:
                     usd.logger.warning('USD is not ARKit compliant')
@@ -838,6 +838,9 @@ def convert_to_usd(gltf_file, usd_file, fps, scale, arkit=False, verbose=False, 
                 else:
                     usd.logger.error('could not create {}'.format(usd_file))
 
+def main(args):
+    if args.gltf_file:
+        convert_to_usd(os.path.expanduser(args.gltf_file), os.path.abspath(os.path.expanduser(args.usd_file)), args.fps, args.scale, args.arkit, args.verbose, args.use_euler_rotation, args.optimize_textures, args.generate_texture_transform_texture)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Convert glTF to USD: v{}'.format(__version__))
@@ -854,6 +857,4 @@ if __name__ == '__main__':
     parser.set_defaults(generate_texture_transform_texture=True)
 
     args = parser.parse_args()
-
-    if args.gltf_file:
-        convert_to_usd(os.path.expanduser(args.gltf_file), os.path.abspath(os.path.expanduser(args.usd_file)), args.fps, args.scale, args.arkit, args.verbose, args.use_euler_rotation, args.optimize_textures, args.generate_texture_transform_texture)
+    main(args)
